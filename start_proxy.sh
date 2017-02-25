@@ -9,7 +9,7 @@ docker run -d -p 80:80 -p 443:443 \
     -v /etc/nginx/vhost.d \
     -v /usr/share/nginx/html \
     -v /var/run/docker.sock:/tmp/docker.sock:ro \
-    seaferguson/nginx-proxy
+    seanferguson/nginx-proxy
 
 docker run -d \
     -v ~/certs:/etc/nginx/certs:rw \
