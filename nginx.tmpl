@@ -198,7 +198,7 @@ server {
 	include /etc/nginx/vhost.d/default;
 	{{ end }}
 
-  root {{ (printf "/etc/nginx/www/%s" $host) }}
+  root {{ (printf "/etc/nginx/www/%s" $host) }};
 
 	location / {
     try_files $uri @backend;
