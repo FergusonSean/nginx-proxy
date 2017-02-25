@@ -1,4 +1,5 @@
 if [[ ! -d ~/certs ]];
+then
   mkdir ~/certs
 fi
 
