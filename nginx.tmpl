@@ -198,13 +198,11 @@ server {
 	include /etc/nginx/vhost.d/default;
 	{{ end }}
 
+  root {{ (printf "/etc/nginx/www/%s" $host) }}
+
 	location / {
-		{{ if eq $proto "uwsgi" }}
-		include uwsgi_params;
-		uwsgi_pass {{ trim $proto }}://{{ trim $upstream_name }};
-		{{ else }}
-		proxy_pass {{ trim $proto }}://{{ trim $upstream_name }};
-		{{ end }}
+    try_files $uri @backend;
+
 		{{ if (exists (printf "/etc/nginx/htpasswd/%s" $host)) }}
 		auth_basic	"Restricted {{ $host }}";
 		auth_basic_user_file	{{ (printf "/etc/nginx/htpasswd/%s" $host) }};
@@ -215,6 +213,20 @@ server {
                 include /etc/nginx/vhost.d/default_location;
                 {{ end }}
 	}
+
+  location @backend {
+		{{ if eq $proto "uwsgi" }}
+		include uwsgi_params;
+		uwsgi_pass {{ trim $proto }}://{{ trim $upstream_name }};
+		{{ else }}
+		proxy_pass {{ trim $proto }}://{{ trim $upstream_name }};
+		{{ end }}
+  }
+
+  location /.well-known/acme-challenge {
+    root /usr/share/nginx/html/.well-known/;
+    break;
+  }
 }
 
 {{ end }}
@@ -235,13 +247,11 @@ server {
 	include /etc/nginx/vhost.d/default;
 	{{ end }}
 
+  root {{ (printf "/etc/nginx/www/%s" $host) }};
+
 	location / {
-		{{ if eq $proto "uwsgi" }}
-		include uwsgi_params;
-		uwsgi_pass {{ trim $proto }}://{{ trim $upstream_name }};
-		{{ else }}
-		proxy_pass {{ trim $proto }}://{{ trim $upstream_name }};
-		{{ end }}
+    try_files $uri @backend;
+
 		{{ if (exists (printf "/etc/nginx/htpasswd/%s" $host)) }}
 		auth_basic	"Restricted {{ $host }}";
 		auth_basic_user_file	{{ (printf "/etc/nginx/htpasswd/%s" $host) }};
@@ -252,6 +262,20 @@ server {
                 include /etc/nginx/vhost.d/default_location;
                 {{ end }}
 	}
+
+  location @backend {
+		{{ if eq $proto "uwsgi" }}
+		include uwsgi_params;
+		uwsgi_pass {{ trim $proto }}://{{ trim $upstream_name }};
+		{{ else }}
+		proxy_pass {{ trim $proto }}://{{ trim $upstream_name }};
+		{{ end }}
+  }
+
+  location /.well-known/acme-challenge {
+    root /usr/share/nginx/html/.well-known/;
+    break;
+  }
 }
 
 {{ if (and (not $is_https) (exists "/etc/nginx/certs/default.crt") (exists "/etc/nginx/certs/default.key")) }}
